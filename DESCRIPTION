@@ -1,0 +1,14 @@
+Package: Rmapit
+Version: 0.1
+Date: 2014-04-17
+Title: A package to facilitate generating geographical maps
+Author: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
+Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
+Depends: R (>= 2.15)
+Imports: methods, sp
+Suggests: 
+Description: The package hosts a set of classes and methods to generate geographical maps.
+License: GPL (>= 2)
+URL: https://github.com/eblondel/Rmapit
+BugReports: https://github.com/eblondel/Rmapit/issues
+Collate:
