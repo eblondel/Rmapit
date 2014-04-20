@@ -11,4 +11,3 @@ Description: The package hosts a set of classes and methods to generate geograph
 License: GPL (>= 2)
 URL: https://github.com/eblondel/Rmapit
 BugReports: https://github.com/eblondel/Rmapit/issues
-Collate:
