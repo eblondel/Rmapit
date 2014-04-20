@@ -16,8 +16,8 @@ plot2map(sp, sp.ref, stat, stat.ref, stat.handler, ratio, pos, offset, pars)
 \arguments{
 \item{sp}{an object of class "spatial" that defines the locations where a plot will be added to the map}
 
-\item{sp.ref}{name of the \code{sp} object column, used as reference to identify each location of the \code{sp} object},
-e.g. the code/name of a sampling station.
+\item{sp.ref}{name of the \code{sp} object column, used as reference to identify each location of the \code{sp} object}, e.g. the code/name 
+of a sampling station.
 
 \item{stat}{an object of class "data.frame" or "list", giving the dataset of values that will be used to produce a plot 
 at each location of the \code{sp} object.}
