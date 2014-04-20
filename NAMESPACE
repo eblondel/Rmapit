@@ -1,2 +1,6 @@
 import(methods)
 import(sp)
+
+export(
+	plot2map
+)
