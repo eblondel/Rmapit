@@ -52,8 +52,10 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 	offset.y <- (plt[4] - plt[3]) * offset	
 	usr <- par("usr")
 	
-	plot.locations <- data.frame(xmin = numeric(0), xmax = numeric(0),
-								 ymin = numeric(0), ymax = numeric(0))
+	plot.locations <- data.frame(xmin = numeric(0), mar.xmin = numeric(0),
+								 xmax = numeric(0), mar.xmax = numeric(0),
+								 ymin = numeric(0), mar.ymin = numeric(0), 
+								 ymax = numeric(0), mar.ymax = numeric(0))
 	
 	#calculate plot relative coordinates (with possible overlaps)
 	for(i in 1:nrow(sp@data)){
@@ -105,14 +107,11 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 			y1 <- y2 - ratio
 		}
 		
-		xmin <- x1 - x1prim
-		xmax <- x2 + x2prim
-		ymin <- y1 - y1prim
-		ymax <- y2 + y2prim
-		plot.locations <- rbind(plot.locations, c(xmin, xmax, ymin, ymax))
+		plot.locations <- rbind(plot.locations, c(x1, x1prim, x2, x2prim, y1, y1prim, y2, y2prim))
 	}
 	plot.locations <- cbind(sp@data[,sp.ref], plot.locations)
-	colnames(plot.locations) <- c(sp.ref, "xmin", "xmax", "ymin", "ymax")
+	colnames(plot.locations) <- c(sp.ref, "xmin", "mar.xmin", "xmax", "mar.xmax",
+										  "ymin", "mar.ymin", "ymax", "mar.ymax")
 	
 	#proceed to the plot drawing
 	for(i in 1:nrow(plot.locations)){	
@@ -138,6 +137,7 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 		}
 	}
 	return(invisible(match.call()))
+	#return(plot.locations)
 }
 
 
