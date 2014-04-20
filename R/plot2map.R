@@ -52,7 +52,10 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 	offset.y <- (plt[4] - plt[3]) * offset	
 	usr <- par("usr")
 	
+	plot.locations <- data.frame(xmin = numeric(0), xmax = numeric(0),
+								 ymin = numeric(0), ymax = numeric(0))
 	
+	#calculate plot relative coordinates (with possible overlaps)
 	for(i in 1:nrow(sp@data)){
 		subsp <- sp[sp@data[,sp.ref] == sp@data[i,sp.ref],]
 		coords <- coordinates(subsp)
@@ -73,17 +76,19 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 		x2 <- x1 + (1 + offset) * ratio
 		y2 <- y1 + (1 + offset) * ratio
 		
-		#min plt adjustments
+		#calculate relative internal plot margins
 		x2prim <- (x2 - x1) * plt[2] / (plt[2] - plt[1])
 		x1prim <- x2prim - (x2 - x1)
+		y2prim <- (y2 - y1) * plt[4] / (plt[4] - plt[3])
+		y1prim <- y2prim - (y2 - y1)
+		
+		#min plt adjustments
 		graph.range.x <- x2 - x1 + x1prim + x2prim
 		if(x1 - graph.range.x < plt[1]){
 			x1 <- x1 + (plt[1] - graph.range.x)
 		}
 		x2 <- x1 + (1 + offset) * ratio
 		
-		y2prim <- (y2 - y1) * plt[4] / (plt[4] - plt[3])
-		y1prim <- y2prim - (y2 - y1)
 		graph.range.y <- y2 - y1 + y1prim + y2prim
 		if(y1 - graph.range.y < plt[3]){
 			y1 <- y1 + (plt[3] - graph.range.y)
@@ -100,18 +105,33 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 			y1 <- y2 - ratio
 		}
 		
+		xmin <- x1 - x1prim
+		xmax <- x2 + x2prim
+		ymin <- y1 - y1prim
+		ymax <- y2 + y2prim
+		plot.locations <- rbind(plot.locations, c(xmin, xmax, ymin, ymax))
+	}
+	plot.locations <- cbind(sp@data[,sp.ref], plot.locations)
+	colnames(plot.locations) <- c(sp.ref, "xmin", "xmax", "ymin", "ymax")
+	
+	#proceed to the plot drawing
+	for(i in 1:nrow(plot.locations)){	
 		substat <- switch(class(stat),
 			"data.frame" = stat[as.character(stat[,stat.ref]) == as.character(subsp@data[1,sp.ref]),],
 			"list" = if(!is.null(names(stat))) stat[[as.character(subsp@data[1,sp.ref])]] else stat[[1]]
 		)	
 		if(nrow(substat) > 0){
 			par(pars)
-			par(plt = c(x1, x2, y1, y2), new = TRUE)
+			par(plt = c(plot.locations[i,"xmin"], plot.locations[i,"xmax"],
+						plot.locations[i,"ymin"], plot.locations[i, "ymax"]),
+				new = TRUE)
 			plot.new()
 			bgcol <- "transparent"
 			if(!is.null(pars$bg)) bgcol <- pars$bg
 			polygon(c(0, 1, 1, 0), c(0, 0, 1, 1),  border = NA, col = bgcol)
-			par(plt = c(x1, x2, y1, y2), new = TRUE)
+			par(plt = c(plot.locations[i,"xmin"], plot.locations[i,"xmax"],
+						plot.locations[i,"ymin"], plot.locations[i, "ymax"]),
+					new = TRUE)
 			stat.handler(substat)
 			par(plt = plt)
 			par(old.par)
