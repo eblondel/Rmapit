@@ -1,8 +1,6 @@
 Rmapit
 ======
 
-https://travis-ci.org/eblondel/Rmapit.svg?branch=master
-
 Rmapit is a package for R that intends to facilitate the production of geographic maps, from simple maps to advanced maps embedding graphic charts. The package will also progressively add functions to facilitate the generation of complete map layouts including legends.
 
 Rmapit will target users and organizations that need to produce maps in batch way like in atlas, yearbooks, or scientific monitoring reports.
