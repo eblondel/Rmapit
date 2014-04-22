@@ -32,7 +32,7 @@ to advanced maps embedding graphic charts.
 
 }
 
-\author{Emmanuel Blondel <emmanuel.blondel1@gmail.com>}
+\author{Emmanuel Blondel, \email{emmanuel.blondel1@gmail.com}}
 
 \references{}
 

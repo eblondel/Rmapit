@@ -50,7 +50,7 @@ In such case, the coordinates used as reference for positioning the plots will b
 
 \references{}
 
-\author{Emmanuel Blondel <emmanuel.blondel1@gmail.com>}
+\author{Emmanuel Blondel, \email{emmanuel.blondel1@gmail.com}}
 \examples{
 #use meuse sample data from sp package
 require(sp)
