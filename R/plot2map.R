@@ -113,10 +113,12 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 		if(x2 > plt[2]){
 			x2 <- plt[2]
 			x1 <- x2 - ratio
+			if(graph.pos != "c") x1 <- x1 - offset * ratio
 		}
 		if(y2 > plt[4]){
 			y2 <- plt[4]
 			y1 <- y2 - ratio
+			if(graph.pos != "c") y1 <- y1 - offset * ratio
 		}
 		
 		plot.locations <- rbind(plot.locations, c(x1, x1prim, x2, x2prim, y1, y1prim, y2, y2prim))
