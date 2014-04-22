@@ -18,7 +18,7 @@
 #	Contact: emmanuel.blondel1 (at) gmail.com
 
 plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
-    						pos = "c", offset = 0.1, pars = NULL){
+    						pos = "c", offset = 0, pars = NULL){
 	
 	old.par <- par(no.readonly = TRUE)
 	
@@ -48,8 +48,6 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 	}
 	
 	plt <- par("plt")	
-	offset.x <- (plt[2] - plt[1]) * offset
-	offset.y <- (plt[4] - plt[3]) * offset	
 	usr <- par("usr")
 	
 	plot.locations <- data.frame(xmin = numeric(0), mar.xmin = numeric(0),
@@ -67,16 +65,22 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 		y1 <- rel$y  + plt[3]
 		
 		graph.pos <- pos[i]
-		if(any(c("b","c","t") == graph.pos)) x1 <- x1 - (0.5 + offset) * ratio
+		if(graph.pos == "c"){
+			x1 <- x1 - 0.5 * ratio
+			y1 <- y1 - 0.5 * ratio
+		}
+		if(any(c("b","t") == graph.pos)) x1 <- x1 - (0.5 + offset) * ratio
 		if(any(c("tl","l","bl") == graph.pos)) x1 <- x1 - (1 + offset) * ratio
 		if(any(c("tr","r","br") == graph.pos)) x1 <- x1 + offset * ratio
-		if(any(c("l","c","r") == graph.pos)) y1 <- y1 - (0.5 + offset) * ratio
+		if(any(c("l","r") == graph.pos)) y1 <- y1 - (0.5 + offset) * ratio
 		if(any(c("bl","b","br") == graph.pos)) y1 <- y1 - (1 + offset) * ratio
 		if(any(c("tl","t","tr") == graph.pos)) y1 <- y1	+ offset * ratio
 		
 		#x2/y2 calculations
-		x2 <- x1 + (1 + offset) * ratio
-		y2 <- y1 + (1 + offset) * ratio
+		x2 <- x1 + ratio
+		if(graph.pos != "c") x2 <- x2 + offset * ratio
+		y2 <- y1 + ratio
+		if(graph.pos != "c") y2 <- y2 + offset * ratio
 		
 		#calculate relative internal plot margins
 		x2prim <- (x2 - x1) * plt[2] / (plt[2] - plt[1])
@@ -86,16 +90,24 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 		
 		#min plt adjustments
 		graph.range.x <- x2 - x1 + x1prim + x2prim
-		if(x1 - graph.range.x < plt[1]){
-			x1 <- x1 + (plt[1] - graph.range.x)
+		if(x2 + x2prim - graph.range.x < plt[1]){
+			x1 <- plt[1] + x1prim
 		}
-		x2 <- x1 + (1 + offset) * ratio
+		if(x1 <= plt[1]){
+			x1 <- x1 + plt[1] + x1prim
+		}
+		x2 <- x1 + ratio
+		if(graph.pos != "c") x2 <- x2 + offset * ratio
 		
 		graph.range.y <- y2 - y1 + y1prim + y2prim
-		if(y1 - graph.range.y < plt[3]){
-			y1 <- y1 + (plt[3] - graph.range.y)
+		if(y2 + y2prim - graph.range.y < plt[3]){
+			y1 <- plt[3] + y1prim
 		}
-		y2 <- y1 + (1 + offset) * ratio
+		if(y1 <= plt[3]){
+			y1 <- y1 + plt[3] + y1prim
+		}
+		y2 <- y1 + ratio
+		if(graph.pos != "c") y2 <- y2 + offset * ratio
 		
 		#max plt adjustments
 		if(x2 > plt[2]){
@@ -124,7 +136,6 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 			par(plt = c(plot.locations[i,"xmin"], plot.locations[i,"xmax"],
 						plot.locations[i,"ymin"], plot.locations[i, "ymax"]),
 				new = TRUE)
-			plot.new()
 			bgcol <- "transparent"
 			if(!is.null(pars$bg)) bgcol <- pars$bg
 			polygon(c(0, 1, 1, 0), c(0, 0, 1, 1),  border = NA, col = bgcol)
@@ -137,7 +148,6 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 		}
 	}
 	return(invisible(match.call()))
-	#return(plot.locations)
 }
 
 
