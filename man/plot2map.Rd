@@ -46,6 +46,13 @@ pos is set to "c" (center). The values accepted are defined as follows: "tl" (to
 \details{
 The \code{sp} argument could point to a \code{SpatialPointsDataFrame} object or any other Spatial object of geometry type other than point. 
 In such case, the coordinates used as reference for positioning the plots will be the \code{labpt} slot of the spatial object.
+
+The function \code{plot2map} brings the advantage to let the user define the graph he wants to embedd in the map. In addition, the implementation
+allows a close linkage with the spatial plot, which means that inset graphs are binded to the map when the graphic device is resized by the user.
+
+However, the current function has several limitations: its capacity to attach inset graphs to spatial coordinates makes the use of multiple plots 
+currently incompatible with \code{plot2map}. For time being, \code{plot2map} can only produce a single main plot.
+
 }
 
 \references{}
