@@ -106,7 +106,6 @@ myHandler2 <- function(x){
 }
 
 #plot the locations
-x11()
 plot(meuse[1:10,])
 
 #generate graphs within the map
