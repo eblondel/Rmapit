@@ -81,12 +81,11 @@ colnames(df) <- c("ref_code","value")
 df$ref_code <- as.character(df$ref_code)
 df$value <- as.numeric(as.character(df$value))
 
-#plot handler
+#example 1: hist plot handler
 myHandler <- function(x){
 	hist(as.numeric(x$value), main="",xlab = NULL, ylab=NULL,
 		col="cornflowerblue", cex.axis =0.8, cex = 0.5)
 }
-
 
 #plot the locations
 plot(meuse[1:10,])
@@ -95,5 +94,24 @@ plot(meuse[1:10,])
 plot2map(sp = meuse[1:10,], sp.ref = "code",
 		stat = df, stat.ref = "ref_code", stat.handler = myHandler,
 		ratio = 0.12, box.lty = "dashed", box.col = "orange")
+
+#example 2: scatterplot handler
+myHandler2 <- function(x){
+	testx <- rnorm(100)
+	testy <- rnorm(100)
+	plot(testx[1:50],testy[1:50],col="red",pch=19,cex=0.7)
+	op = par(new=T)
+	plot(testx[50:100],testy[50:100],col="blue",pch=19,cex=0.7)
+	par(op)
+}
+
+#plot the locations
+x11()
+plot(meuse[1:10,])
+
+#generate graphs within the map
+plot2map(sp = meuse[1:10,], sp.ref = "code",
+		stat = df, stat.ref = "ref_code", stat.handler = myHandler2,
+		ratio = 0.12, box.lty = "dashed", box.col = "orange")	
 
 }
