@@ -11,13 +11,13 @@ containing the data to be plotted. This object must have a common reference with
 Finally, the function requires the user to specify a function that will be used to draw the plot at each location.}
 
 \usage{
-plot2map(sp, sp.ref, stat, stat.ref, stat.handler, ratio, pos, offset, pars)
+plot2map(sp, sp.ref, stat, stat.ref, stat.handler, ratio, pos, offset, pars, box.lty, box.col)
 }
 \arguments{
 \item{sp}{an object of class "spatial" that defines the locations where a plot will be added to the map}
 
-\item{sp.ref}{name of the \code{sp} object column, used as reference to identify each location of the \code{sp} object}, e.g. the code/name 
-of a sampling station.
+\item{sp.ref}{name of the \code{sp} object column, used as reference to identify each location of the \code{sp} object, e.g. the code/name 
+of a sampling station.}
 
 \item{stat}{an object of class "data.frame" or "list", giving the dataset of values that will be used to produce a plot 
 at each location of the \code{sp} object.}
@@ -40,6 +40,10 @@ pos is set to "c" (center). The values accepted are defined as follows: "tl" (to
 "center" plot position, the \code{offset} parameter is not applied.}
 
 \item{pars}{optional list of graphical parameters to apply to the internal plot drawn at each xy location.}
+
+\item{box.lty}{line type used for drawing the \code{box("figure")} for each graph inset. Default value is "solid".}
+
+\item{box.col}{line color used for drawing the \code{box("figure")} for each graph inset. Default value is "transparent".}
 
 }
 
@@ -89,6 +93,7 @@ plot(meuse[1:10,])
 
 #generate graphs within the map
 plot2map(sp = meuse[1:10,], sp.ref = "code",
-		stat = df, stat.ref = "ref_code", stat.handler = myHandler)
+		stat = df, stat.ref = "ref_code", stat.handler = myHandler,
+		ratio = 0.12, box.lty = "dashed", box.col = "orange")
 
 }

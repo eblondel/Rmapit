@@ -18,20 +18,11 @@
 #	Contact: emmanuel.blondel1 (at) gmail.com
 
 plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
-    	pos = "c", offset = 0, pars = NULL){
+    	pos = "c", offset = 0, pars = NULL, box.lty = "solid", box.col = "transparent"){
 	
 	old.par <- par(no.readonly = TRUE)
-	mfrow <- par("mfrow")
-	mfcol <- par("mfcol")
-	mfg <- par("mfg")
-	#names.par <- names(par())[!names(par()) %in% c("mfrow","mfcol","mfg")]
-	#on.exit(par(par(no.readonly = TRUE)[names.par]))
-	#on.exit(par(old.par, new = T))
-	#on.exit(par(mfrow = mfrow, mfcol = mfcol, mfg = mfg))
 	plt <- par("plt")
-	
-	#switch to fig / layout approach
-	fig <- par("fig")
+	fig <- par("fig") #switch to fig / layout approach
 	
 	#position
 	pos <- tolower(pos)
@@ -45,7 +36,6 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 	
 	#calculate plot relative coordinates (with possible overlaps)
 	plot.locations <- data.frame(xmin = numeric(0), xmax = numeric(0), ymin = numeric(0), ymax = numeric(0))
-	plot.margins <- data.frame()
 	for(i in 1:nrow(sp@data)){
 		subsp <- sp[sp@data[,sp.ref] == sp@data[i,sp.ref],]
 		coords <- coordinates(subsp)
@@ -119,18 +109,6 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 	plot.locations <- cbind(sp@data[,sp.ref], plot.locations)
 	colnames(plot.locations) <- c(sp.ref, "xmin", "xmax", "ymin", "ymax")
 	
-	#function to drawn polygon
-	drawPolygon <- function(locations){
-		bgcol <- "transparent"
-		if(!is.null(pars$bg)) bgcol <- pars$bg
-		polygon(
-			grconvertX(c(locations$xmin, locations$xmax, locations$xmax, locations$xmin), from = "ndc", to = "nfc"),
-			grconvertY(c(locations$ymin, locations$ymin, locations$ymax, locations$ymax), from = "ndc", to = "nfc"),
-			border = "black",
-			col = bgcol
-		)
-	}
-	
 	#proceed to the plot drawing
 	if(!is.null(pars)) par(pars)
 	for(i in 1:nrow(plot.locations)){	
@@ -139,38 +117,52 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 				"list" = if(!is.null(names(stat))) stat[[as.character(subsp@data[1,sp.ref])]] else stat[[1]]
 		)	
 		if(nrow(substat) > 0){
-
+			
 			#approach using fig and layout allows to attach graphics to map
 			graph.fig <- par("fig")
 			graph.coords <- plot.locations[i,]
-			graph.coords$xmin <- graph.fig[1] + graph.coords$xmin * (graph.fig[2] - graph.fig[1])
-			graph.coords$xmax <- graph.fig[1] + graph.coords$xmax * (graph.fig[2] - graph.fig[1])
-			graph.coords$ymin <- graph.fig[3] + graph.coords$ymin * (graph.fig[4] - graph.fig[3])
-			graph.coords$ymax <- graph.fig[3] + graph.coords$ymax * (graph.fig[4] - graph.fig[3])
+			op = par(plt = plt, fig = graph.fig, new=T)		
 			
-			op = par(plt = plt, fig = graph.fig, new=T)
-			drawPolygon(graph.coords)
+			graph.margins <- c(grconvertX(par("mai")[c(2,4)], "inches", "nfc"), grconvertY(par("mai")[c(1,3)], "inches", "nfc"))
+			graph.bounds <- c(graph.fig[1], 1 - graph.fig[2], graph.fig[3], 1 - graph.fig[4])			
+			#if(fig[1] > 0) graph.bounds[1] <- graph.bounds[1] + graph.margins[1] + graph.margins[2]
+			#if(fig[2] < 1) graph.bounds[2] <- graph.bounds[2] + graph.margins[1] + graph.margins[2]
+			#if(fig[3] > 0) graph.bounds[3] <- graph.bounds[3] + graph.margins[3] + graph.margins[4]
+			#if(fig[4] < 1) graph.bounds[4] <- graph.bounds[4] + graph.margins[3] + graph.margins[4]
 			
-			op = par(plt = plt, fig = graph.fig, new=T)
+			#calculate relative layouts
+			layout.width <- c(graph.bounds[1], graph.coords$xmin, graph.coords$xmax - graph.coords$xmin, graph.fig[2] - graph.coords$xmax, graph.bounds[2])
+			layout.height <- c(graph.bounds[4], fig[4] - graph.coords$ymax, graph.coords$ymax - graph.coords$ymin, graph.coords$ymin, graph.bounds[3])
+			#print("===")
+			#print(layout.width)
+			#print(layout.height)
+			
 			nf <- layout(
 					matrix(
-						data = c(0,0,0,
-						  		 0,1,0,
-						  		 0,0,0),
-	  					nrow = 3,
-						ncol = 3,
-						byrow = TRUE
+							data = c(0,0,0,0,0,
+								    0,0,0,0,0,
+								    0,0,1,0,0,
+						  		    0,0,0,0,0,
+								    0,0,0,0,0),
+	  						nrow = 5,
+							ncol = 5,
+							byrow = TRUE
 					),
-					width = c(graph.coords$xmin, graph.coords$xmax - graph.coords$xmin, 1 - graph.coords$xmax),
-					height = c(1 - graph.coords$ymax, graph.coords$ymax - graph.coords$ymin, graph.coords$ymin),
+					width = layout.width,
+					height = layout.height,
 					TRUE
-				 )
+			)
+			
+			
 			stat.handler(substat)
+			box("figure", lty = box.lty, col = box.col)
+			
 			par(op)
+			
 			
 		}
 	}
-
-	return(invisible(match.call()))
-	#return(list(locations = plot.locations, margins = plot.margins))
+	par(old.par)
+	#return(invisible(match.call()))
+	return(list(locations = plot.locations, margins = plot.margins))
 }
