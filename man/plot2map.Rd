@@ -100,7 +100,7 @@ myHandler2 <- function(x){
 	testx <- rnorm(100)
 	testy <- rnorm(100)
 	plot(testx[1:50],testy[1:50],col="red",pch=19,cex=0.7)
-	op = par(new=T)
+	op = par(new = TRUE)
 	plot(testx[50:100],testy[50:100],col="blue",pch=19,cex=0.7)
 	par(op)
 }
