@@ -11,7 +11,8 @@ containing the data to be plotted. This object must have a common reference with
 Finally, the function requires the user to specify a function that will be used to draw the plot at each location.}
 
 \usage{
-plot2map(sp, sp.ref, stat, stat.ref, stat.handler, ratio, pos, offset, pars, box.lty, box.col)
+plot2map(sp, sp.ref, stat, stat.ref, stat.handler, ratio, pos, offset, 
+		 pars, box.lty, box.col)
 }
 \arguments{
 \item{sp}{an object of class "spatial" that defines the locations where a plot will be added to the map}
@@ -101,7 +102,7 @@ myHandler2 <- function(x){
 	testy <- rnorm(100)
 	plot(testx[1:50],testy[1:50],col="red",pch=19,cex=0.7)
 	op = par(new = TRUE)
-	plot(testx[50:100],testy[50:100],col="blue",pch=19,cex=0.7)
+	points(testx[50:100],testy[50:100],col="blue",pch=19,cex=0.7)
 	par(op)
 }
 

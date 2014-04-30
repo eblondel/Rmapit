@@ -1,6 +1,6 @@
 Package: Rmapit
 Version: 0.1
-Date: 2014-04-22
+Date: 2014-04-30
 Title: A package to facilitate the drawing of geographical maps in R
 Author: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
