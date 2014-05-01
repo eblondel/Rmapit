@@ -56,8 +56,21 @@ The function \code{plot2map} brings the advantage to let the user define the gra
 allows a close linkage with the spatial plot, which means that inset graphs are binded to the map when the graphic device is resized by the user.
 
 However, the current function has several limitations: its capacity to attach inset graphs to spatial coordinates makes the use of multiple plots 
-currently incompatible with \code{plot2map}. For time being, \code{plot2map} can only produce a single main plot.
+currently incompatible with \code{plot2map}. For time being, \code{plot2map} is stable only for single plot (one figure per device).
 
+The ongoing investigations are focusing on the capacity to make \code{plot2map} working for multiplot devices. Some test code is provided.
+
+\emph{Current limitations:}
+
+\describe{
+	\item{multiplot drawing order}{Due to the internal use of \code{layout} and \code{par("fig")}, eventual multiplot set by the user is disabled, 
+	which forces to recall initial \code{pars}, and \code{par(mfg)}. This approach is partially operational as the \code{byrow} plotting order is 
+	forced, even if the user specifies multiplots with \code{par(mfcol = ...)}}.
+	
+	\item{graph inset positions}{Accurate graph inset positions were noted with multiplot with \code{nr} and \code{nc} <= 2, but resizing of device
+	leads to unbound graph insets in relation to the map locations. Multiplots with more than 2 lines or rows do not handle well \code{plot2map}.
+	}	
+}	
 }
 
 \references{}
@@ -83,6 +96,7 @@ df$ref_code <- as.character(df$ref_code)
 df$value <- as.numeric(as.character(df$value))
 
 #example 1: hist plot handler
+#----------------------------
 myHandler <- function(x){
 	hist(as.numeric(x$value), main="",xlab = NULL, ylab=NULL,
 		col="cornflowerblue", cex.axis =0.8, cex = 0.5)
@@ -97,6 +111,7 @@ plot2map(sp = meuse[1:10,], sp.ref = "code",
 		ratio = 0.12, box.lty = "dashed", box.col = "orange")
 
 #example 2: scatterplot handler
+#------------------------------
 myHandler2 <- function(x){
 	testx <- rnorm(100)
 	testy <- rnorm(100)
@@ -113,5 +128,15 @@ plot(meuse[1:10,])
 plot2map(sp = meuse[1:10,], sp.ref = "code",
 		stat = df, stat.ref = "ref_code", stat.handler = myHandler2,
 		ratio = 0.12, box.lty = "dashed", box.col = "orange")	
+
+
+#example 3: enabling multiplots (under investigation)
+#--------------------------------------------------
+par(mar=c(2,2,2,2), mfrow=c(2,2))
+for(i in 1:4){
+	plot(meuse[1:10,])
+	plot2map(sp = meuse[1:10,], sp.ref = "code",
+		stat = df, stat.ref = "ref_code", stat.handler = myHandler, ratio=0.08)
+}
 
 }
