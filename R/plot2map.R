@@ -21,8 +21,42 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
     	pos = "c", offset = 0, pars = NULL, box.lty = "solid", box.col = "transparent"){
 	
 	old.par <- par(no.readonly = TRUE)
+	
+	#graphical params used in the function
 	plt <- par("plt")
-	fig <- par("fig") #switch to fig / layout approach
+	fig <- par("fig")
+	
+	#define the order of indexing (bycol vs. byrow) will be needed to be reset multiplot pars
+    #after adding each graph inset (using fig deactivates multiplot)
+	mfrow <- par("mfrow")
+	mfcol <- par("mfcol")
+	mfg <- par("mfg")
+	#byrow <- NULL
+	#if(mfrow[1] != 1 || mfrow[2] != 1){
+	#	byrow <- FALSE
+	#	dev.new()
+	#	par(old.par)
+	#	print(par("mfg"))
+	#	plot.new()
+	#	print(par("mfg"))
+	#	mfg.prev <- par("mfg")
+	#	plot.new()
+	#	mfg.next <- par("mfg")
+	#	print(par("mfg"))
+	#	mfg.dif <- mfg.next - mfg.prev
+	#	if((mfg.dif[1] == 0 && mfg.dif[2] == 1) || (mfg.dif[1] ==1 && mfg.dif[2] < 0)){
+	#		byrow = TRUE
+	#	}
+	#	dev.off()
+		
+		#reset mfg to cancel plot.new() call required for determining indexing
+	#	print(byrow)
+	#	if(byrow){
+	#		par(mfrow = mfrow, mfg = mfg.prev, new = T)
+	#	}else{
+	#		par(mfcol = mfcol, mfg = mfg.prev, new = T)
+	#	}
+	#}
 	
 	#position
 	pos <- tolower(pos)
@@ -41,7 +75,6 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 		coords <- coordinates(subsp)
 		x1 <- grconvertX(coords[1], from = "user", to = "ndc")
 		y1 <- grconvertY(coords[2], from = "user", to = "ndc")
-		print(c(x1,y1))
 		
 		graph.pos <- pos[i]
 		if(graph.pos == "c"){
@@ -112,6 +145,8 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 	#proceed to the plot drawing
 	if(!is.null(pars)) par(pars)
 	for(i in 1:nrow(plot.locations)){	
+		
+		#handle the stat subset
 		substat <- switch(class(stat),
 				"data.frame" = stat[as.character(stat[,stat.ref]) == as.character(subsp@data[1,sp.ref]),],
 				"list" = if(!is.null(names(stat))) stat[[as.character(subsp@data[1,sp.ref])]] else stat[[1]]
@@ -120,49 +155,63 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 			
 			#approach using fig and layout allows to attach graphics to map
 			graph.fig <- par("fig")
+			print(graph.fig)
 			graph.coords <- plot.locations[i,]
 			op = par(plt = plt, fig = graph.fig, new=T)		
 			
-			graph.margins <- c(grconvertX(par("mai")[c(2,4)], "inches", "nfc"), grconvertY(par("mai")[c(1,3)], "inches", "nfc"))
-			graph.bounds <- c(graph.fig[1], 1 - graph.fig[2], graph.fig[3], 1 - graph.fig[4])			
+			graph.margins <- c(grconvertX(par("mai")[c(2,4)], "inches", "ndc"), grconvertY(par("mai")[c(1,3)], "inches", "ndc"))
+			graph.bounds <- c(graph.fig[1], 1 - graph.fig[2], graph.fig[3], 1 - graph.fig[4])
 			#if(fig[1] > 0) graph.bounds[1] <- graph.bounds[1] + graph.margins[1] + graph.margins[2]
 			#if(fig[2] < 1) graph.bounds[2] <- graph.bounds[2] + graph.margins[1] + graph.margins[2]
 			#if(fig[3] > 0) graph.bounds[3] <- graph.bounds[3] + graph.margins[3] + graph.margins[4]
 			#if(fig[4] < 1) graph.bounds[4] <- graph.bounds[4] + graph.margins[3] + graph.margins[4]
 			
 			#calculate relative layouts
-			layout.width <- c(graph.bounds[1], graph.coords$xmin, graph.coords$xmax - graph.coords$xmin, graph.fig[2] - graph.coords$xmax, graph.bounds[2])
-			layout.height <- c(graph.bounds[4], fig[4] - graph.coords$ymax, graph.coords$ymax - graph.coords$ymin, graph.coords$ymin, graph.bounds[3])
+			layout.width <- c(graph.bounds[1] + graph.coords$xmin,
+							  graph.coords$xmax - graph.coords$xmin,
+							  graph.fig[2] - graph.coords$xmax + graph.bounds[2])
+			layout.height <- c(graph.bounds[4] + fig[4] - graph.coords$ymax,
+							   graph.coords$ymax - graph.coords$ymin,
+							   graph.coords$ymin + graph.bounds[3])
 			#print("===")
 			#print(layout.width)
 			#print(layout.height)
 			
-			nf <- layout(
+			layout(
 					matrix(
-							data = c(0,0,0,0,0,
-								    0,0,0,0,0,
-								    0,0,1,0,0,
-						  		    0,0,0,0,0,
-								    0,0,0,0,0),
-	  						nrow = 5,
-							ncol = 5,
+							data = c(0,0,0,
+									 0,1,0,
+									 0,0,0),
+	  						nrow = 3,
+							ncol = 3,
 							byrow = TRUE
 					),
 					width = layout.width,
 					height = layout.height,
-					TRUE
+					TRUE #TODO play with FALSE
 			)
 			
-			
+			#add graph inset
 			stat.handler(substat)
 			box("figure", lty = box.lty, col = box.col)
-			
 			par(op)
-			
-			
+			#if(is.null(byrow)){
+			#	par(new = F)
+			#}else{
+			#	if(byrow){
+			#		par(mfrow = mfrow, mfg = mfg, new = F)
+			#	}else{
+			#		par(mfcol = mfcol, mfg = mfg, new = F)
+			#	}
+			#}		
 		}
 	}
-	par(old.par)
+	
+	#reset the initial pars (including eventual multiplot sequence)
+	#TODO investigate how to deal with the order bycol vs. byrow (seems byrow is always reset)
+	par(old.par) 
+	par(mfg = mfg, new = F)
+	
 	#return(invisible(match.call()))
 	return(list(locations = plot.locations, margins = plot.margins))
 }
