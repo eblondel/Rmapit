@@ -31,33 +31,7 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 	mfrow <- par("mfrow")
 	mfcol <- par("mfcol")
 	mfg <- par("mfg")
-	#byrow <- NULL
-	#if(mfrow[1] != 1 || mfrow[2] != 1){
-	#	byrow <- FALSE
-	#	dev.new()
-	#	par(old.par)
-	#	print(par("mfg"))
-	#	plot.new()
-	#	print(par("mfg"))
-	#	mfg.prev <- par("mfg")
-	#	plot.new()
-	#	mfg.next <- par("mfg")
-	#	print(par("mfg"))
-	#	mfg.dif <- mfg.next - mfg.prev
-	#	if((mfg.dif[1] == 0 && mfg.dif[2] == 1) || (mfg.dif[1] ==1 && mfg.dif[2] < 0)){
-	#		byrow = TRUE
-	#	}
-	#	dev.off()
-		
-		#reset mfg to cancel plot.new() call required for determining indexing
-	#	print(byrow)
-	#	if(byrow){
-	#		par(mfrow = mfrow, mfg = mfg.prev, new = T)
-	#	}else{
-	#		par(mfcol = mfcol, mfg = mfg.prev, new = T)
-	#	}
-	#}
-	
+
 	#position
 	pos <- tolower(pos)
 	ppos <- c("tl", "t", "tr", "l", "c", "r", "bl", "b", "br")
@@ -73,8 +47,8 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 	for(i in 1:nrow(sp@data)){
 		subsp <- sp[sp@data[,sp.ref] == sp@data[i,sp.ref],]
 		coords <- coordinates(subsp)
-		x1 <- grconvertX(coords[1], from = "user", to = "ndc")
-		y1 <- grconvertY(coords[2], from = "user", to = "ndc")
+		x1 <- grconvertX(coords[1], from = "user", to = "nic")
+		y1 <- grconvertY(coords[2], from = "user", to = "nic")
 		
 		graph.pos <- pos[i]
 		if(graph.pos == "c"){
@@ -167,15 +141,17 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 			#if(fig[4] < 1) graph.bounds[4] <- graph.bounds[4] + graph.margins[3] + graph.margins[4]
 			
 			#calculate relative layouts
-			layout.width <- c(graph.bounds[1] + graph.coords$xmin,
+			layout.respect =TRUE
+			layout.width <- c(graph.coords$xmin,
 							  graph.coords$xmax - graph.coords$xmin,
-							  graph.fig[2] - graph.coords$xmax + graph.bounds[2])
-			layout.height <- c(graph.bounds[4] + fig[4] - graph.coords$ymax,
+							  1 - graph.coords$xmax)
+			
+			layout.height <- c(1 - graph.coords$ymax,
 							   graph.coords$ymax - graph.coords$ymin,
-							   graph.coords$ymin + graph.bounds[3])
-			#print("===")
-			#print(layout.width)
-			#print(layout.height)
+							   graph.coords$ymin)
+			print("===")
+			print(layout.width)
+			print(layout.height)
 			
 			layout(
 					matrix(
@@ -188,22 +164,13 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
 					),
 					width = layout.width,
 					height = layout.height,
-					TRUE #TODO play with FALSE
+					layout.respect
 			)
 			
 			#add graph inset
 			stat.handler(substat)
 			box("figure", lty = box.lty, col = box.col)
-			par(op)
-			#if(is.null(byrow)){
-			#	par(new = F)
-			#}else{
-			#	if(byrow){
-			#		par(mfrow = mfrow, mfg = mfg, new = F)
-			#	}else{
-			#		par(mfcol = mfcol, mfg = mfg, new = F)
-			#	}
-			#}		
+			par(op)	
 		}
 	}
 	
