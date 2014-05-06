@@ -98,6 +98,13 @@ working for multiplot devices. Some test code is provided.
   unbound graph insets in relation to the map locations. Multiplots with more 
   than 2 lines or rows do not handle well \code{plot2map}.}	
 }	
+
+\emph{Note for RStudio users}: RStudio has a specific graphic device (see 
+\code{getOption("device")}), which causes rendering issues when using 
+\code{plot2map}. To solve this, the R default graphical device should be used 
+instead. With RStudio, it is possible to use R default graphic device by deleting
+existing RStudio devices and run \code{options(options(device = "windows"))}
+
 }
 
 \references{}
