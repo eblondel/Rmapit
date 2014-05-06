@@ -31,7 +31,7 @@ plot2map(sp, sp.ref, stat, stat.ref, stat.handler, ratio, pos, offset,
   object.}
 
 \item{stat.ref}{(optional) in case the \code{stat} object is of class 
-  \code{data.frame},\code{stat.ref} is the name of the \code{stat} column being 
+  \code{data.frame}, \code{stat.ref} is the name of the \code{stat} column being 
   joined to \code{sp.ref}, to associate each plot to generate to its location on
   the map.}
 
