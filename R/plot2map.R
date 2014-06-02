@@ -121,6 +121,8 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
   if(!is.null(pars)) par(pars)
   for(i in 1:nrow(plot.locations)){	
     
+    subsp <- sp[sp@data[,sp.ref] == sp@data[i,sp.ref],]
+    
     #handle the stat subset
     substat <- switch(class(stat),
                       "data.frame" = stat[as.character(stat[,stat.ref]) ==
