@@ -56,10 +56,9 @@ plot2map <- function(sp, sp.ref, stat, stat.ref, stat.handler, ratio = 0.05,
       x1 <- x1 - 0.5 * ratio
       y1 <- y1 - 0.5 * ratio
     }
-    if(any(c("b","t") == graph.pos)) x1 <- x1 - (0.5 + offset) * ratio
+
     if(any(c("tl","l","bl") == graph.pos)) x1 <- x1 - (1 + offset) * ratio
     if(any(c("tr","r","br") == graph.pos)) x1 <- x1 + offset * ratio
-    if(any(c("l","r") == graph.pos)) y1 <- y1 - (0.5 + offset) * ratio
     if(any(c("bl","b","br") == graph.pos)) y1 <- y1 - (1 + offset) * ratio
     if(any(c("tl","t","tr") == graph.pos)) y1 <- y1	+ offset * ratio
     
